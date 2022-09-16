@@ -48,6 +48,7 @@ create_best_fit <- function(data = contracts) {
 }
 
 
+
 ## VARS ========================================================================
 ## Primary reference table for the application filters. This needs to be a table
 ## so we can keep leverage the relationships between columns in server.R to

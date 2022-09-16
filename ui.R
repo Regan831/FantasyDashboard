@@ -4,7 +4,9 @@ library(shinythemes)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
-    theme = shinytheme("sandstone"),
+    # includeCSS('stylesheet.css'),
+
+    theme = shinytheme("slate"),
 
     ##########
     ## PAGE 1
@@ -16,7 +18,7 @@ shinyUI(fluidPage(
             titlePanel("Salary Prices And Scoring"),
 
             fluidRow(column(12,
-                plotlyOutput("distPlot")
+                plotlyOutput("all_plot")
             )),
             hr(),
 
@@ -62,6 +64,14 @@ shinyUI(fluidPage(
            selectInput('team_select'
                        ,'Team: '
                        ,choices = contracts %>% distinct(Fantasy.Team) %>% pull())
+           ,hr()
+           ,fluidRow(
+                column(6, plotlyOutput("team_plot"))
+                ,box(
+                   width = 6,
+                   reactableOutput("team_table")
+               )
+           )
         )
    )
 ))
