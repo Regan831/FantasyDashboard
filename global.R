@@ -26,6 +26,28 @@ contracts <- read.csv('capOverview.csv') %>%
   mutate(salary = salary / 1000000)
 
 
+## GLOBAL FUNCTIONS  ===========================================================
+create_best_fit <- function(data = contracts) {
+  y <- data$Fantasy.Points
+  X <- data$salary
+
+  lm_model <- linear_reg() %>%
+    set_engine('lm') %>%
+    set_mode('regression') %>%
+    fit(Fantasy.Points ~ salary, data = data)
+
+  x_range <- seq(min(X), max(X), length.out = 100)
+  x_range <- matrix(x_range, nrow=100, ncol=1)
+  xdf <- data.frame(x_range)
+  colnames(xdf) <- c('salary')
+
+  ydf <- lm_model %>% predict(xdf)
+  colnames(ydf) <- c('Fantasy.Points')
+  xy <- data.frame(xdf, ydf)
+  return(xy)
+}
+
+
 ## VARS ========================================================================
 ## Primary reference table for the application filters. This needs to be a table
 ## so we can keep leverage the relationships between columns in server.R to

@@ -13,26 +13,16 @@ library(tidymodels)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
     output$distPlot <- renderPlotly({
-
         contracts_subset <- contracts %>%
             filter(salary < input$salary) %>%
             filter(Fantasy.Team %in% input$team_choice)
-        y <- contracts$Fantasy.Points
-        X <- contracts$salary
 
-        lm_model <- linear_reg() %>%
-            set_engine('lm') %>%
-            set_mode('regression') %>%
-            fit(Fantasy.Points ~ salary, data = contracts)
+        if(input$update_line == TRUE) {
+            xy <- create_best_fit(contracts_subset)
+        } else {
+            xy <- create_best_fit()
+        }
 
-        x_range <- seq(min(X), max(X), length.out = 100)
-        x_range <- matrix(x_range, nrow=100, ncol=1)
-        xdf <- data.frame(x_range)
-        colnames(xdf) <- c('salary')
-
-        ydf <- lm_model %>% predict(xdf)
-        colnames(ydf) <- c('Fantasy.Points')
-        xy <- data.frame(xdf, ydf)
 
         fig <- contracts_subset %>%
             plot_ly(

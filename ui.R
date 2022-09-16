@@ -12,7 +12,7 @@ shinyUI(fluidPage(
     # Application title
     navbarPage("League of Nations",
         tabPanel(
-            "",
+            "Home",
             titlePanel("Salary Prices And Scoring"),
 
             fluidRow(column(12,
@@ -29,12 +29,19 @@ shinyUI(fluidPage(
                             max = 50,
                             value = 50)
                  )
-                 ,column(6, align='left',
+                 ,column(3, align='left',
                         radioButtons("stratification"
                               ,"Plot Markers:"
                               ,c("Fantasy Team" = "Fantasy.Team"
                                  ,"Player Position" = "Pos")
                         )
+                )
+                ,column(3, align='left',
+                         radioButtons("update_line"
+                                      ,"Update Best Fit Line:"
+                                      ,c("Yes" = TRUE
+                                         ,"No" = FALSE)
+                         )
                 )
                 ,column(12,align='center',
                         checkboxGroupInput(
@@ -44,6 +51,17 @@ shinyUI(fluidPage(
                             choices = contracts %>% distinct(Fantasy.Team) %>% pull()
                         ))
             )
+        ),
+        ##########
+        ## PAGE 2
+        ##########
+        # Application title
+        tabPanel(
+           "Manager Stats",
+           titlePanel("Manager Stats"),
+           selectInput('team_select'
+                       ,'Team: '
+                       ,choices = contracts %>% distinct(Fantasy.Team) %>% pull())
         )
-    )
+   )
 ))
