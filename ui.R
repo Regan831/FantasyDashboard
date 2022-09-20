@@ -1,11 +1,7 @@
-library(shiny)
-library(shinythemes)
-
-
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
     # includeCSS('stylesheet.css'),
-
+    useShinydashboard(),
     theme = shinytheme("slate"),
 
     ##########
@@ -61,17 +57,34 @@ shinyUI(fluidPage(
         tabPanel(
            "Manager Stats",
            titlePanel("Manager Stats"),
-           selectInput('team_select'
-                       ,'Team: '
-                       ,choices = contracts %>% distinct(Fantasy.Team) %>% pull())
+           fluidRow(
+               column(selectInput('team_select'
+                           ,'Team: '
+                           ,choices = contracts %>% distinct(Fantasy.Team) %>% pull()), width=6)
+               ,valueBoxOutput("team_contract_avg", width = 6)
+           )
            ,hr()
            ,fluidRow(
-                column(6, plotlyOutput("team_plot"))
-                ,box(
+               column(
                    width = 6,
                    reactableOutput("team_table")
-               )
+               ),
+                column(6, plotlyOutput("team_plot"))
            )
+        ),
+        ##########
+        ## PAGE 3
+        ##########
+        # Application title
+        tabPanel(
+            "All Contracts"
+            ,titlePanel("All Contracts")
+            ,fluidRow(
+                column(
+                    width = 12,
+                    reactableOutput("all_players_table")
+                )
+            )
         )
    )
 ))

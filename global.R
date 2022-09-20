@@ -8,9 +8,15 @@ library(dplyr)
 library(rsconnect)
 library(ggplot2)
 library(plotly)
+library(r2r)
+library(parsnip)
+library(shinyWidgets)
+library(shinythemes)
+library(tidymodels)
 
 ## SOURCE ======================================================================
 ## If you have any functions not in global.R or server.R, source it here.
+source('functions.R')
 
 ## REMOTE DATA =================================================================
 players <- read.csv('players.csv')
@@ -25,28 +31,23 @@ contracts <- read.csv('capOverview.csv') %>%
                             ,Remaining.Years == 1 ~ as.numeric(Remaining.Value))) %>%
   mutate(salary = salary / 1000000)
 
+models <- hashmap()
+models[['WR']] <- create_position_regression('WR')
+models[['QB']] <- create_position_regression('QB')
+models[['PK']] <- create_position_regression('PK')
+models[['DF']] <- create_position_regression('DF')
+models[['TE']] <- create_position_regression('TE')
+models[['RB']] <- create_position_regression('RB')
 
-## GLOBAL FUNCTIONS  ===========================================================
-create_best_fit <- function(data = contracts) {
-  y <- data$Fantasy.Points
-  X <- data$salary
+contract_value <- contracts %>%
+  apply(1, determine_contract_value)
 
-  lm_model <- linear_reg() %>%
-    set_engine('lm') %>%
-    set_mode('regression') %>%
-    fit(Fantasy.Points ~ salary, data = data)
 
-  x_range <- seq(min(X), max(X), length.out = 100)
-  x_range <- matrix(x_range, nrow=100, ncol=1)
-  xdf <- data.frame(x_range)
-  colnames(xdf) <- c('salary')
 
-  ydf <- lm_model %>% predict(xdf)
-  colnames(ydf) <- c('Fantasy.Points')
-  xy <- data.frame(xdf, ydf)
-  return(xy)
-}
-
+contracts <- contracts %>%
+  cbind(contract_value) %>%
+  filter(Fantasy.Points > 0) %>%
+  mutate(contract_value=round(scales::rescale(contract_value,to=c(0, 100)),2))
 
 
 ## VARS ========================================================================
